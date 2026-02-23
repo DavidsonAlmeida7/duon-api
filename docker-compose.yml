@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  duon_db:
+    image: postgres:16
+    container_name: duon_db
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      retries: 5
+
+  duon_api:
+    build: .
+    container_name: duon_api
+    depends_on:
+      duon_db:
+        condition: service_healthy
+    env_file:
+      - .env
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    command: ["./app"]
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "8080:80"
+    depends_on:
+      - duon_db
+
+  #redis:
+  #  image: redis:7
+  #  container_name: app_redis
+  #  ports:
+  #    - "${REDIS_PORT}:6379"
+
+  ##worker:
+  ##  build: .
+  ##  container_name: app_worker
+  ##  depends_on:
+  ##    - redis
+  ##    - postgres
+  ##  env_file:
+  ##    - .env
+  ##  command: ["./worker"]
+
+volumes:
+  postgres_data:
