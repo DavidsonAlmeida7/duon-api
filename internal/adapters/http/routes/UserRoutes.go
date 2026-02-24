@@ -2,7 +2,6 @@ package routes
 
 import (
 	userHandler "duon-api/internal/adapters/http/handlers"
-	"duon-api/internal/adapters/http/routes"
 	userService "duon-api/internal/core/ports/usecase"
 	"duon-api/internal/infra/repository"
 
@@ -17,7 +16,7 @@ func NewRouter(db *pgxpool.Pool) *mux.Router {
 	userService := userService.NewUserService(userRepo)
 	userHandler := userHandler.NewUserHandler(userService)
 
-	r.HandleFunc(routes.GetUserRoutesConst, userHandler.GetUsers).Methods("GET")
+	r.HandleFunc("/users", userHandler.GetUsers).Methods("GET")
 	r.HandleFunc("/users/{id}", userHandler.GetUserByID).Methods("GET")
 
 	return r
