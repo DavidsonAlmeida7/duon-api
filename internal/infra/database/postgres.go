@@ -2,7 +2,7 @@ package database
 
 import (
 	"context"
-	"duon-api/internal/domain/helper"
+	"duon-api/internal/core/domain/helper"
 	"fmt"
 	"os"
 	"time"

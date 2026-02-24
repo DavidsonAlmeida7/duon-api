@@ -1,20 +1,19 @@
-package http
+package handlers
 
 import (
+	"duon-api/internal/core/ports/usecase"
 	"encoding/json"
 	"net/http"
 	"strconv"
-
-	"duon-api/internal/application"
 
 	"github.com/gorilla/mux"
 )
 
 type UserHandler struct {
-	service *application.UserService
+	service *usecase.UserService
 }
 
-func NewUserHandler(service *application.UserService) *UserHandler {
+func NewUserHandler(service *usecase.UserService) *UserHandler {
 	return &UserHandler{service}
 }
 

@@ -2,9 +2,8 @@ package repository
 
 import (
 	"context"
+	"duon-api/internal/core/domain"
 	"errors"
-
-	"duon-api/internal/domain"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )

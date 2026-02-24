@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"time"
 
+	httpInterface "duon-api/internal/adapters/http/routes"
 	"duon-api/internal/infra/database"
-	httpInterface "duon-api/internal/interface/http"
 )
 
 func main() {

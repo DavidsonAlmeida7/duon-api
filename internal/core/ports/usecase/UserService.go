@@ -1,9 +1,9 @@
-package application
+package usecase
 
 import (
 	"context"
 
-	"duon-api/internal/domain"
+	"duon-api/internal/core/domain"
 	"duon-api/internal/infra/repository"
 )
 
