@@ -24,7 +24,7 @@ func NewUserRepository(db *pgxpool.Pool) UserRepository {
 func (r *userRepository) FindAll(ctx context.Context) ([]domain.User, error) {
 	rows, err := r.db.Query(ctx, `
 		SELECT id, name, email, created_at
-		FROM users
+		FROM user
 	`)
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (r *userRepository) FindAll(ctx context.Context) ([]domain.User, error) {
 func (r *userRepository) FindByID(ctx context.Context, id uint) (*domain.User, error) {
 	row := r.db.QueryRow(ctx, `
 		SELECT id, name, email, created_at
-		FROM users
+		FROM "user"
 		WHERE id = $1
 	`, id)
 
