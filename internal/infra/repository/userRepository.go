@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"duon-api/internal/core/domain"
+	"duon-api/internal/core/domain/helper"
 	"errors"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -24,11 +25,12 @@ func NewUserRepository(db *pgxpool.Pool) UserRepository {
 func (r *userRepository) FindAll(ctx context.Context) ([]domain.User, error) {
 	rows, err := r.db.Query(ctx, `
 		SELECT id, name, email, created_at
-		FROM user
+		FROM "user"
 	`)
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 
 	var users []domain.User
@@ -44,8 +46,11 @@ func (r *userRepository) FindAll(ctx context.Context) ([]domain.User, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		users = append(users, user)
 	}
+
+	helper.Debug("A", users)
 
 	return users, nil
 }
