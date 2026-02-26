@@ -14,6 +14,8 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
       retries: 5
+    environment:
+      - TZ=America/Sao_Paulo
 
   duon_api:
     build:
@@ -29,8 +31,8 @@ services:
       - "${APP_PORT}:${APP_PORT}"
     volumes:
       - .:/app
-    #environment:
-    #  - AIR_WATCHER=poll
+    environment:
+      - TZ=America/Sao_Paulo
     tty: true
     stdin_open: true
 

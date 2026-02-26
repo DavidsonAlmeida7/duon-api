@@ -1,6 +1,6 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION "uuid-ossp";
 
-CREATE TABLE IF NOT EXISTS usuarios (
+CREATE TABLE usuarios (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     nome VARCHAR(120) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
@@ -8,11 +8,11 @@ CREATE TABLE IF NOT EXISTS usuarios (
     criado_em TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email);
+CREATE INDEX idx_usuarios_email ON usuarios(email);
 
-CREATE TYPE IF NOT EXISTS tipo_divisao_enum AS ENUM ('IGUAL', 'PROPORCIONAL');
+CREATE TYPE tipo_divisao_enum AS ENUM ('IGUAL', 'PROPORCIONAL');
 
-CREATE TABLE IF NOT EXISTS casais (
+CREATE TABLE casais (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     usuario1_id UUID NOT NULL REFERENCES usuarios(id),
     usuario2_id UUID NOT NULL REFERENCES usuarios(id),
@@ -23,10 +23,10 @@ CREATE TABLE IF NOT EXISTS casais (
     CHECK (usuario1_id <> usuario2_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_casal_usuario1 ON casais(usuario1_id);
-CREATE INDEX IF NOT EXISTS idx_casal_usuario2 ON casais(usuario2_id);
+CREATE INDEX idx_casal_usuario1 ON casais(usuario1_id);
+CREATE INDEX idx_casal_usuario2 ON casais(usuario2_id);
 
-CREATE TABLE IF NOT EXISTS despesas (
+CREATE TABLE despesas (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     casal_id UUID NOT NULL REFERENCES casais(id) ON DELETE CASCADE,
     pago_por_id UUID NOT NULL REFERENCES usuarios(id),
@@ -36,11 +36,11 @@ CREATE TABLE IF NOT EXISTS despesas (
     criado_em TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_despesas_casal ON despesas(casal_id);
-CREATE INDEX IF NOT EXISTS idx_despesas_data ON despesas(data_despesa);
-CREATE INDEX IF NOT EXISTS idx_despesas_casal_data ON despesas(casal_id, data_despesa);
+CREATE INDEX idx_despesas_casal ON despesas(casal_id);
+CREATE INDEX idx_despesas_data ON despesas(data_despesa);
+CREATE INDEX idx_despesas_casal_data ON despesas(casal_id, data_despesa);
 
-CREATE TABLE IF NOT EXISTS metas (
+CREATE TABLE metas (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     casal_id UUID NOT NULL REFERENCES casais(id) ON DELETE CASCADE,
     nome VARCHAR(120) NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS metas (
     criado_em TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS equidade_mensal (
+CREATE TABLE equidade_mensal (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     casal_id UUID NOT NULL REFERENCES casais(id) ON DELETE CASCADE,
     mes_referencia CHAR(7) NOT NULL,
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS equidade_mensal (
 );
 
 -- (OPCIONAL FUTURO)
-CREATE TABLE IF NOT EXISTS progresso_casal (
+CREATE TABLE progresso_casal (
     casal_id UUID PRIMARY KEY REFERENCES casais(id) ON DELETE CASCADE,
     pontuacao INT NOT NULL DEFAULT 0 CHECK (pontuacao >= 0),
     nivel_atual VARCHAR(50) NOT NULL,
