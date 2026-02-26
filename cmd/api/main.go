@@ -27,6 +27,7 @@ func main() {
 	}
 
 	go func() {
+		log.Printf("DATABASE CONNECTION SUCCESSFULLY OPENED")
 		log.Println("API RUNNING...")
 		log.Println("PORT :" + os.Getenv("APP_PORT"))
 
