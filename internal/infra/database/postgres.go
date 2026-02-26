@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"duon-api/internal/core/domain/helper"
 	"fmt"
 	"os"
 	"time"
@@ -11,9 +10,6 @@ import (
 )
 
 func NewPostgres() (*pgxpool.Pool, error) {
-	//dsn := "postgres://davidson:admin@duon_db:5432/duondb?sslmode=disable"
-	//DATABASE_URL=postgres://{user}:{password}@{hostname}:{port}/{database-name}
-
 	dsn := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		os.Getenv("POSTGRES_USER"),
@@ -23,8 +19,6 @@ func NewPostgres() (*pgxpool.Pool, error) {
 		os.Getenv("POSTGRES_DATABASE"),
 		os.Getenv("POSTGRES_SSLMODE"),
 	)
-
-	helper.Debug("A", dsn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

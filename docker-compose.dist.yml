@@ -27,12 +27,7 @@ services:
       - .env
     ports:
       - "${APP_PORT}:${APP_PORT}"
-    volumes:
-      - .:/app
-    #environment:
-    #  - AIR_WATCHER=poll
-    tty: true
-    stdin_open: true
+    command: ["./app"]
 
   pgadmin:
     image: dpage/pgadmin4
@@ -69,3 +64,4 @@ services:
 
 volumes:
   postgres_data:
+  

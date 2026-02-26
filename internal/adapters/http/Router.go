@@ -8,6 +8,8 @@ import (
 )
 
 func NewRouter(db *pgxpool.Pool) *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
+
 	router := gin.Default()
 
 	routes.RegisterUserRoutes(router, db)

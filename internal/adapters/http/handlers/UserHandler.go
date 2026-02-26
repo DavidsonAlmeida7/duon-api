@@ -23,6 +23,8 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 		return
 	}
 
+	//sdsd
+
 	c.JSON(http.StatusOK, users)
 }
 

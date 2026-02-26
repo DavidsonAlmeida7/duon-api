@@ -27,7 +27,9 @@ func main() {
 	}
 
 	go func() {
-		log.Println("API running...")
+		log.Println("API RUNNING...")
+		log.Println("PORT :" + os.Getenv("APP_PORT"))
+
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal(err)
 		}
