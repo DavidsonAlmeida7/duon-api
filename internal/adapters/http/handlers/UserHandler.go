@@ -3,9 +3,9 @@ package handlers
 import (
 	"duon-api/internal/core/ports/usecase"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type UserHandler struct {
@@ -23,21 +23,19 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 		return
 	}
 
-	//sdsd
-
 	c.JSON(http.StatusOK, users)
 }
 
 func (h *UserHandler) GetUserByID(c *gin.Context) {
 	idParam := c.Param("id")
 
-	id, err := strconv.Atoi(idParam)
+	id, err := uuid.Parse(idParam)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 		return
 	}
 
-	user, err := h.service.GetUserByID(c.Request.Context(), uint(id))
+	user, err := h.service.GetUserByID(c.Request.Context(), uuid.UUID(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return

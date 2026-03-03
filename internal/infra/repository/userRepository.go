@@ -4,28 +4,25 @@ import (
 	"context"
 	"duon-api/internal/core/domain"
 	"duon-api/internal/core/domain/helper"
+	"duon-api/internal/core/ports/repositories"
 	"errors"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type UserRepository interface {
-	FindAll(ctx context.Context) ([]domain.User, error)
-	FindByID(ctx context.Context, id uint) (*domain.User, error)
-}
-
-type userRepository struct {
+type UserRepository struct {
 	db *pgxpool.Pool
 }
 
-func NewUserRepository(db *pgxpool.Pool) UserRepository {
-	return &userRepository{db}
+func NewUserRepository(db *pgxpool.Pool) repositories.UserRepository {
+	return &UserRepository{db}
 }
 
-func (r *userRepository) FindAll(ctx context.Context) ([]domain.User, error) {
+func (r *UserRepository) FindAll(ctx context.Context) ([]domain.User, error) {
 	rows, err := r.db.Query(ctx, `
-		SELECT id, name, email, created_at
-		FROM "user"
+		SELECT id, nome, email, criado_em
+		FROM usuarios
 	`)
 	if err != nil {
 		return nil, err
@@ -55,10 +52,10 @@ func (r *userRepository) FindAll(ctx context.Context) ([]domain.User, error) {
 	return users, nil
 }
 
-func (r *userRepository) FindByID(ctx context.Context, id uint) (*domain.User, error) {
+func (r *UserRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
 	row := r.db.QueryRow(ctx, `
-		SELECT id, name, email, created_at
-		FROM "user"
+		SELECT id, nome, email, criado_em
+		FROM usuarios
 		WHERE id = $1
 	`, id)
 
