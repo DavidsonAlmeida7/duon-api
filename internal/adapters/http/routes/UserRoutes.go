@@ -1,7 +1,7 @@
 package routes
 
 import (
-	userHandler "duon-api/internal/adapters/http/handlers"
+	userHandler "duon-api/internal/adapters/http/handlers/userHandler"
 	routesconstants "duon-api/internal/adapters/http/routesConstants"
 	userService "duon-api/internal/core/ports/usecase"
 	"duon-api/internal/infra/repository"
@@ -11,10 +11,14 @@ import (
 )
 
 func RegisterUserRoutes(group *gin.Engine, db *pgxpool.Pool) {
-	userRepo := repository.NewUserRepository(db)
-	userService := userService.NewUserService(userRepo)
-	userHandler := userHandler.NewUserHandler(userService)
+	userRepository := repository.NewUserRepository(db)
 
-	group.GET(routesconstants.GetUsersRoutesConst, userHandler.GetUsers)
-	group.GET(routesconstants.GetUserByIDRouteConst, userHandler.GetUserByID)
+	listUsersService := userService.NewListUsersService(userRepository)
+	listUsersHandler := userHandler.NewListUsersHandler(listUsersService)
+
+	findUserService := userService.NewFindUserService(userRepository)
+	findUserHandler := userHandler.NewFindUserHandler(findUserService)
+
+	group.GET(routesconstants.GetUsersRoutesConst, listUsersHandler.Handle)
+	group.GET(routesconstants.GetUserByIDRouteConst, findUserHandler.Handle)
 }

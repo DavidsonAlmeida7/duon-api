@@ -11,17 +11,17 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type UserRepository struct {
+type UserDatabase struct {
 	db *pgxpool.Pool
 }
 
-func NewUserRepository(db *pgxpool.Pool) repositories.UserRepository {
-	return &UserRepository{db}
+func NewUserRepository(db *pgxpool.Pool) repositories.UserRepositoryInterface {
+	return &UserDatabase{db}
 }
 
-func (r *UserRepository) FindAll(ctx context.Context) ([]domain.User, error) {
+func (r *UserDatabase) FindAll(ctx context.Context) ([]domain.User, error) {
 	rows, err := r.db.Query(ctx, `
-		SELECT id, nome, email, criado_em
+		SELECT id, nome, email, senha_hash, criado_em
 		FROM usuarios
 	`)
 	if err != nil {
@@ -38,6 +38,7 @@ func (r *UserRepository) FindAll(ctx context.Context) ([]domain.User, error) {
 			&user.ID,
 			&user.Name,
 			&user.Email,
+			&user.Password,
 			&user.CreatedAt,
 		)
 		if err != nil {
@@ -52,7 +53,7 @@ func (r *UserRepository) FindAll(ctx context.Context) ([]domain.User, error) {
 	return users, nil
 }
 
-func (r *UserRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
+func (r *UserDatabase) FindByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
 	row := r.db.QueryRow(ctx, `
 		SELECT id, nome, email, criado_em
 		FROM usuarios

@@ -10,7 +10,7 @@ import (
 // UserRepository define como o Core espera que os dados sejam salvos ou buscados.
 // Não importa se é Postgres, MongoDB ou um arquivo JSON.
 // Output Port: O que o UseCase exige do banco de dados
-type UserRepository interface {
+type UserRepositoryInterface interface {
 	FindAll(ctx context.Context) ([]domain.User, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*domain.User, error)
 	//Save(user domain.User) error
