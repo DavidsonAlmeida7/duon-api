@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"duon-api/internal/adapters/http/requestEntity/userRequestEntity"
+	"duon-api/internal/core/domain"
 	"duon-api/internal/core/ports"
 	"duon-api/internal/core/ports/usecase"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,19 +21,38 @@ func NewFindUserHandler(service *usecase.FindUserService) ports.HandlerInterface
 }
 
 func (findUserHandler *FindUserHandler) Handle(context *gin.Context) {
-	idParam := context.Param("id")
+	//idParam := context.Param("id")
 
-	id, err := uuid.Parse(idParam)
+	userRequest, err := findUserHandler.defineUser(context)
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	user, err := findUserHandler.service.Execute(context.Request.Context(), uuid.UUID(id))
+	user, err := findUserHandler.service.Execute(context.Request.Context(), uuid.UUID(userRequest.ID))
 	if err != nil {
-		context.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		context.JSON(http.StatusNotFound, gin.H{"error": "Usuário não encontrado!"})
 		return
 	}
 
 	context.JSON(http.StatusOK, user)
+}
+
+func (findUserHandler *FindUserHandler) defineUser(context *gin.Context) (*domain.User, error) {
+	//idParam := context.Param("id")
+	//
+	//id, err := uuid.Parse(idParam)
+
+	userRequest, err := userRequestEntity.NewFindUserRequest(context)
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+
+	if err := userRequest.Validate(); err != nil {
+		return nil, errors.New(err.Error())
+	}
+
+	return &domain.User{
+		ID: userRequest.Id,
+	}, nil
 }

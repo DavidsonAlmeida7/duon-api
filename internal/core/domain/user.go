@@ -1,24 +1,56 @@
 package domain
 
 import (
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
 )
 
+// Erros de domínio permitem que os adapters saibam exatamente o que falhou
+var (
+	ErrUserNotFound      = errors.New("user not found")
+	ErrUserInvalidEmail  = errors.New("invalid email address")
+	ErrUserAlreadyExists = errors.New("user already exists")
+)
+
 type User struct {
-	ID        uuid.UUID `gorm:"primaryKey"`
-	Name      string    `gorm:"size:100"`
-	Email     string    `gorm:"uniqueIndex"`
-	Password  string    `gorm:"not null;type:varchar(255);" json:"senha_hash"`
+	ID        uuid.UUID
+	Name      string
+	Email     string
+	Password  string
 	CreatedAt time.Time
 }
 
-type UserOutput struct {
-	id            uuid.UUID `gorm:"primaryKey"`
-	nome          string    `gorm:"size:100"`
-	email         string    `gorm:"uniqueIndex"`
-	senha         string
-	cadastrado_em time.Time
-	//Status        string `gorm:"column:status;not null;type:enum('expired', 'pending', 'logged');"`
+func NewUser(name, email, password string) (*User, error) {
+	user := &User{
+		Name:      name,
+		Email:     email,
+		Password:  password,
+		CreatedAt: time.Now(),
+	}
+
+	if err := user.Validate(); err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
+
+func (u *User) Validate() error {
+	if u.Email == "" {
+		return ErrUserInvalidEmail
+	}
+
+	// Adicione outras validações de domínio aqui
+
+	return nil
+}
+
+//func (u *User) Activate() {
+//	u.Active = true
+//}
+//
+//func (u *User) Deactivate() {
+//	u.Active = false
+//}
