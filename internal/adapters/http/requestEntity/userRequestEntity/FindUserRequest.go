@@ -1,7 +1,6 @@
 package userRequestEntity
 
 import (
-	"duon-api/internal/core/domain/helper"
 	"errors"
 
 	"github.com/gin-gonic/gin"
@@ -9,22 +8,33 @@ import (
 )
 
 type FindUserRequest struct {
-	Id uuid.UUID `uri:"id" binding:"required"`
+	Id string `uri:"id" binding:"required"`
 }
 
 func NewFindUserRequest(context *gin.Context) (*FindUserRequest, error) {
 	findUserRequest := &FindUserRequest{}
-	helper.Debug("teste", context.Param("id"))
 	if err := context.ShouldBindUri(findUserRequest); err != nil {
 		return nil, err
 	}
+
+	parsedId, err := uuid.Parse(findUserRequest.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	findUserRequest.Id = parsedId.String()
 
 	return findUserRequest, nil
 }
 
 func (findUserRequest *FindUserRequest) Validate() error {
-	if findUserRequest.Id == uuid.Nil {
+	parsedId, err := uuid.Parse(findUserRequest.Id)
+	if err != nil {
 		return errors.New("ID inválido!")
+	}
+
+	if parsedId == uuid.Nil {
+		return errors.New("ID não pode ser vazio!")
 	}
 
 	return nil

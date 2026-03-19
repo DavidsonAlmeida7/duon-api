@@ -3,8 +3,6 @@ package domain
 import (
 	"errors"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 // Erros de domínio permitem que os adapters saibam exatamente o que falhou
@@ -15,7 +13,7 @@ var (
 )
 
 type User struct {
-	ID        uuid.UUID
+	ID        string
 	Name      string
 	Email     string
 	Password  string

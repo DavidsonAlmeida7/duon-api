@@ -9,7 +9,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type FindUserHandler struct {
@@ -21,15 +20,13 @@ func NewFindUserHandler(service *usecase.FindUserService) ports.HandlerInterface
 }
 
 func (findUserHandler *FindUserHandler) Handle(context *gin.Context) {
-	//idParam := context.Param("id")
-
 	userRequest, err := findUserHandler.defineUser(context)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	user, err := findUserHandler.service.Execute(context.Request.Context(), uuid.UUID(userRequest.ID))
+	user, err := findUserHandler.service.Execute(context.Request.Context(), userRequest.ID)
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"error": "Usuário não encontrado!"})
 		return
@@ -39,10 +36,6 @@ func (findUserHandler *FindUserHandler) Handle(context *gin.Context) {
 }
 
 func (findUserHandler *FindUserHandler) defineUser(context *gin.Context) (*domain.User, error) {
-	//idParam := context.Param("id")
-	//
-	//id, err := uuid.Parse(idParam)
-
 	userRequest, err := userRequestEntity.NewFindUserRequest(context)
 	if err != nil {
 		return nil, errors.New(err.Error())

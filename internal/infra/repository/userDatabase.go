@@ -7,7 +7,6 @@ import (
 	"duon-api/internal/core/ports/repositories"
 	"errors"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -53,7 +52,7 @@ func (r *UserDatabase) FindAll(ctx context.Context) ([]domain.User, error) {
 	return users, nil
 }
 
-func (r *UserDatabase) FindByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
+func (r *UserDatabase) FindByID(ctx context.Context, id string) (*domain.User, error) {
 	row := r.db.QueryRow(ctx, `
 		SELECT id, nome, email, criado_em
 		FROM usuarios

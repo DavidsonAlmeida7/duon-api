@@ -2,23 +2,23 @@ CREATE EXTENSION "uuid-ossp";
 
 CREATE TABLE usuarios (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    nome VARCHAR(120) NOT NULL,
-    email VARCHAR(150) NOT NULL UNIQUE,
+    nome_completo VARCHAR(60) NOT NULL,
+    email VARCHAR(50) NOT NULL UNIQUE,
+    whatsapp VARCHAR(12) NOT NULL,
+    data_nascimento DATE NOT NULL,
     senha_hash VARCHAR(255) NOT NULL,
-    criado_em TIMESTAMP NOT NULL DEFAULT NOW()
+    data_cadastro TIMESTAMP NOT NULL DEFAULT NOW(),
+    data_atualizado TIMESTAMP NULL
 );
 
 CREATE INDEX idx_usuarios_email ON usuarios(email);
 
--- CREATE TYPE tipo_divisao_enum AS ENUM ('IGUAL', 'PROPORCIONAL');
--- CREATE TYPE tipo_grupo_enum AS ENUM ('INDIVIDUAL', 'CASAL');
-
 CREATE TABLE grupos_financeiros (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    tipo ENUM('INDIVIDUAL', 'CASAL', 'FAMILIA') NOT NULL,
-    tipo_divisao ENUM('IGUAL', 'PROPORCIONAL') NULL,
+    status_grupo ENUM('PENDENTE', 'ATIVO') NOT NULL DEFAULT 'PENDENTE',
+    tipo ENUM('INDIVIDUAL', 'CASAL', 'FAMILIA', 'GRUPO', 'SOCIOS') NOT NULL,
     nome VARCHAR(120),
-    criado_em TIMESTAMP NOT NULL DEFAULT NOW()
+    data_cadastro TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 -- Se grupo_finaceiro for tipo = individual, percentual_responsabilidade = 100.00
@@ -29,6 +29,28 @@ CREATE TABLE grupo_usuarios (
     PRIMARY KEY (grupo_id, usuario_id)
 );
 
+CREATE TABLE renda_usuario (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    usuario_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    valor NUMERIC(12,2) NOT NULL CHECK (valor > 0),
+    data_inicio DATE NOT NULL,
+    data_fim DATE,
+    data_cadastro TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_renda_usuario_usuario ON renda_usuario(usuario_id);
+
+CREATE TABLE regra_divisao_grupo (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    grupo_id UUID NOT NULL REFERENCES grupos_financeiros(id) ON DELETE CASCADE,
+    tipo_divisao ENUM('IGUAL', 'PROPORCIONAL', 'PERCENTUAL') NOT NULL,
+    data_inicio DATE NOT NULL,
+    data_fim DATE,
+    data_cadastro TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_regra_grupo ON regra_divisao_grupo(grupo_id);
+
 CREATE TABLE despesas (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     grupo_id UUID NOT NULL REFERENCES grupos_financeiros(id) ON DELETE CASCADE,
@@ -36,7 +58,7 @@ CREATE TABLE despesas (
     valor NUMERIC(12,2) NOT NULL CHECK (valor > 0),
     categoria VARCHAR(80),
     data_despesa DATE NOT NULL,
-    criado_em TIMESTAMP NOT NULL DEFAULT NOW()
+    data_cadastro TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_despesas_casal ON despesas(grupo_id);
@@ -50,13 +72,13 @@ CREATE TABLE metas (
     valor_objetivo NUMERIC(12,2) NOT NULL CHECK (valor_objetivo > 0),
     valor_atual NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (valor_atual >= 0),
     data_limite DATE,
-    criado_em TIMESTAMP NOT NULL DEFAULT NOW()
+    data_cadastro TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE equidade_mensal (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     grupo_id UUID NOT NULL REFERENCES grupos_financeiros(id) ON DELETE CASCADE,
-    mes_referencia CHAR(7) NOT NULL,
+    mes_referencia CHAR(7) NOT NULL, -- 2026-02
     percentual_usuario1 NUMERIC(5,2),
     percentual_usuario2 NUMERIC(5,2),
     nivel VARCHAR(50),
@@ -69,7 +91,7 @@ CREATE TABLE progresso_grupo (
     grupo_id UUID PRIMARY KEY REFERENCES grupos_financeiros(id) ON DELETE CASCADE,
     pontuacao INT NOT NULL DEFAULT 0 CHECK (pontuacao >= 0),
     nivel_atual VARCHAR(50) NOT NULL,
-    atualizado_em TIMESTAMP NOT NULL DEFAULT NOW()
+    data_atualizado TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE historico_nivel_grupo (
@@ -78,3 +100,14 @@ CREATE TABLE historico_nivel_grupo (
     nivel VARCHAR(50) NOT NULL,
     atingido_em TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE convites_grupo (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    status ENUM('PENDENTE', 'ACEITO', 'EXPIRADO') NOT NULL DEFAULT 'PENDENTE',
+    email_convidado VARCHAR(150) NOT NULL,
+    token UUID NOT NULL UNIQUE,
+    grupo_id UUID NOT NULL REFERENCES grupos_financeiros(id) ON DELETE CASCADE,
+    data_cadastro TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_convite_email ON convites_grupo(email_convidado);
